@@ -16,4 +16,9 @@ class LicenceHolderApplicant implements LicenceApplicant
     {
         return true;
     }
+
+    public function getId(): int
+    {
+        return 123;
+    }
 }

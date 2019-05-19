@@ -16,4 +16,9 @@ class ValidApplicant implements LicenceApplicant
     {
         return false;
     }
+
+    public function getId(): int
+    {
+        return 123;
+    }
 }

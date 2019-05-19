@@ -9,6 +9,18 @@ use PHPUnit\Framework\TestCase;
 
 class DrivingLicenceGeneratorTest extends TestCase
 {
+
+    private $logger;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->logger = new SpyLogger();
+
+        $this->generator = new DrivingLicenceGenerator($this->logger);
+    }
+
     public function testUnderAgeApplicantCannotGenerateLicence()
     {
         $this->expectException(InvalidDriverException::class);
@@ -16,8 +28,21 @@ class DrivingLicenceGeneratorTest extends TestCase
 
         $applicant = new UnderAgeApplicant();
 
-        $generator = new DrivingLicenceGenerator();
-        $generator->generateNumber($applicant);
+        $this->generator->generateNumber($applicant);
+    }
+
+    public function testUnderAgeApplicationsAreLogged()
+    {
+        $applicant = new UnderAgeApplicant();
+
+        try {
+            $this->generator->generateNumber($applicant);
+        } catch (InvalidDriverException $e) {
+
+        }
+
+        $this->assertEquals(1, $this->logger->noticeCalledCount);
+        $this->assertEquals("Under age application user: 123", $this->logger->noticeLastMessage);
     }
 
     public function testLicenceHolderCannotGenerateLicence()
@@ -27,15 +52,28 @@ class DrivingLicenceGeneratorTest extends TestCase
 
         $applicant = new LicenceHolderApplicant();
 
-        $generator = new DrivingLicenceGenerator();
-        $generator->generateNumber($applicant);
+        $this->generator->generateNumber($applicant);
     }
 
-    public function testValidApplicantCanGenerateLicence()
+    public function testLicenceHolderAttemtsLogged()
     {
-        $applicant = new ValidApplicant();
+        $applicant = new LicenceHolderApplicant();
 
-        $generator = new DrivingLicenceGenerator();
-        $generator->generateNumber($applicant);
+        try {
+            $this->generator->generateNumber($applicant);
+        } catch (InvalidDriverException $e) {
+
+        }
+
+        $this->assertEquals(1, $this->logger->noticeCalledCount);
+        $this->assertEquals("duplicate application user: 123", $this->logger->noticeLastMessage);
     }
+
+//    public function testValidApplicantCanGenerateLicence()
+//    {
+//        $applicant = new ValidApplicant();
+//
+//        $generator = new DrivingLicenceGenerator();
+//        $generator->generateNumber($applicant);
+//    }
 }
