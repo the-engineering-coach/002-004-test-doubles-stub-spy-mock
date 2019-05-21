@@ -21,4 +21,14 @@ class LicenceHolderApplicant implements LicenceApplicant
     {
         return 123;
     }
+
+    public function getDateOfBirth(): \DateTime
+    {
+        return new \DateTime();
+    }
+
+    public function getInitials(): string
+    {
+        return "DEF";
+    }
 }

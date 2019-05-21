@@ -7,13 +7,15 @@ use Psr\Log\LoggerInterface;
 
 class DrivingLicenceGenerator
 {
-
     private $logger;
+    private $randomNumbersGenerator;
 
-
-    public function __construct(LoggerInterface $logger)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        RandomNumbersGenerator $randomNumbersGenerator
+    ) {
         $this->logger = $logger;
+        $this->randomNumbersGenerator = $randomNumbersGenerator;
     }
 
     public function generateNumber(LicenceApplicant $applicant)
@@ -31,5 +33,13 @@ class DrivingLicenceGenerator
                 "Cannot hold more than one licence"
             );
         }
+
+        $licence = $applicant->getInitials() .
+            $applicant->getDateOfBirth()->format("dmY");
+
+        $numberOfDigits = 15 - strlen($licence);
+        $numberOfDigits = ($numberOfDigits < 4) ? 4 : $numberOfDigits;
+
+        return $licence . $this->randomNumbersGenerator->generate($numberOfDigits);
     }
 }
